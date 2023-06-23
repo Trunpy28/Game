@@ -7,7 +7,7 @@ import java.awt.*;
 public class Player extends GameCharacter {
 
     private final PlayerHandle ph = new PlayerHandle();
-    private int velocity = 20;
+    private int velocity = 10;
     private PlayerState state = PlayerState.IDLE;
     private boolean rightTendency = true;
 
@@ -57,15 +57,15 @@ public class Player extends GameCharacter {
                     changeState(PlayerState.L_SLIDE);
                     if (ph.leftPressed) x -= (velocity / 3);
                 }
-            } else if (((state == PlayerState.HURT || state == PlayerState.L_HURT) && animationTick == 2)
+            } else if (((state == PlayerState.HURT || state == PlayerState.L_HURT) && animationTick/2 == 2)
                     || (state != PlayerState.HURT && state != PlayerState.L_HURT)) {
                 if (rightTendency) changeState(PlayerState.IDLE);
                 else changeState(PlayerState.L_IDLE);
             }
 
             if (state == PlayerState.JUMP || state == PlayerState.L_JUMP) {
-                if (animationTick > 0 && animationTick < 4) y -= 20;
-                else if (animationTick > 3 && animationTick < 7) y += 20;
+                if (animationTick/2 > 0 && animationTick/2 < 4) y -= 12;
+                else if (animationTick/2 > 3 && animationTick/2 < 7) y += 12;
             }
         }
     }
@@ -74,10 +74,10 @@ public class Player extends GameCharacter {
         if (health > 0) {
             animationTick++;
         } else {
-            if (animationTick < 3) animationTick++;
+            if (animationTick/2 < 3) animationTick++;
         }
 
-        g2D.drawImage(state.getSpriteAtIdx(animationTick), x, y, 128, 64, null);
+        g2D.drawImage(state.getSpriteAtIdx(animationTick/2), x, y, 128, 64, null);
     }
 
     public boolean checkSpecialState(PlayerState s) {
@@ -87,14 +87,14 @@ public class Player extends GameCharacter {
     }
 
     public void changeState(PlayerState st) {
-        if (checkSpecialState(state) && (animationTick == state.getImgNum() - 1)) {
+        if (checkSpecialState(state) && (animationTick/2 == state.getImgNum() - 1)) {
             animationTick = 0;
             state = st;
         } else if (!checkSpecialState(state)) {
             if (state != st) {
                 animationTick = 0;
                 state = st;
-            } else if (animationTick == state.getImgNum() - 1) {
+            } else if (animationTick/2 == state.getImgNum() - 1) {
                 animationTick = 0;
             }
         }

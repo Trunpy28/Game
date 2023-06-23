@@ -13,7 +13,7 @@ public class GamePanel extends JPanel implements Runnable {
     final int row = 10;
     final int screenWidth = tileWidth * col;
     final int screenHeight = tileHeight * row;
-    private int FPS = 10;
+    private int FPS = 30;
 
     Player player = new Player(100, 400, 10);
 
