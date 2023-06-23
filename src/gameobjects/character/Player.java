@@ -1,62 +1,106 @@
 package gameobjects.character;
 
-import gamepanel.GamePanel;
-import keyboard.PlayerHandle;
+import utils.PlayerHandle;
 
 import java.awt.*;
 
 public class Player extends GameCharacter {
-    GamePanel gp;
-    PlayerHandle ph;
 
-    public Player(GamePanel gp, PlayerHandle ph) {
-        this.gp = gp;
-        this.ph = ph;
+    private final PlayerHandle ph = new PlayerHandle();
+    private int velocity = 20;
+    private PlayerState state = PlayerState.IDLE;
+    private boolean rightTendency = true;
 
-        setDefaultValues();
-    }
-
-    public void setDefaultValues() {
-        this.x = 200;
-        this.y = 200;
-        this.speed = 2;
-        this.states.add(PlayerState.RUN);
-        this.states.add(PlayerState.IDLE);
+    public Player(int x, int y, int health) {
+        super(x, y, health);
     }
 
     public void update() {
-        if (ph.upPressed || ph.downPressed || ph.leftPressed || ph.rightPressed) {
-            if (ph.upPressed) {
-                y -= speed;
-            } else if (ph.downPressed) {
-                y += speed;
-            } else if (ph.leftPressed) {
-                x -= speed;
-            } else
-                x += speed;
+        if (ph.low) {
+            if (health != 0) {
+                health--;
+                isAttacked = true;
+            }
         }
-        spriteCounter++;
-        if (spriteCounter > 12) {
-            if (spriteNum < PlayerState.RUN.getLstImg().length-1) {
-                spriteNum++;
-            } else spriteNum = 0;
-            spriteCounter = 0;
-        }
-        else{
-            spriteCounter++;
-            if (spriteCounter > 12) {
-                if (spriteNum < PlayerState.IDLE.getLstImg().length-1) {
-                    spriteNum++;
-                } else spriteNum = 0;
-                spriteCounter = 0;
+        if (health == 0) {
+            if (state != PlayerState.DEATH && state != PlayerState.L_DEATH) {
+                if (rightTendency) changeState(PlayerState.DEATH);
+                else changeState(PlayerState.L_DEATH);
+            }
+        } else {
+            if (isAttacked) {
+                if (rightTendency) changeState(PlayerState.HURT);
+                else changeState(PlayerState.L_HURT);
+                isAttacked = false;
+            }
+            if (ph.rightPressed && !ph.upPressed && !ph.downPressed) {
+                rightTendency = true;
+                changeState(PlayerState.RUN);
+                x += velocity;
+            } else if (ph.leftPressed && !ph.upPressed && !ph.downPressed) {
+                rightTendency = false;
+                changeState(PlayerState.L_RUN);
+                x -= velocity;
+            } else if (ph.upPressed && !ph.downPressed) {
+                if (rightTendency) {
+                    changeState(PlayerState.JUMP);
+                    if (ph.rightPressed) x += (velocity / 3);
+                } else {
+                    changeState(PlayerState.L_JUMP);
+                    if (ph.leftPressed) x -= (velocity / 3);
+                }
+            } else if (ph.downPressed && !ph.upPressed) {
+                if (rightTendency) {
+                    changeState(PlayerState.SLIDE);
+                    if (ph.rightPressed) x += (velocity / 3);
+                } else {
+                    changeState(PlayerState.L_SLIDE);
+                    if (ph.leftPressed) x -= (velocity / 3);
+                }
+            } else if (((state == PlayerState.HURT || state == PlayerState.L_HURT) && animationTick == 2)
+                    || (state != PlayerState.HURT && state != PlayerState.L_HURT)) {
+                if (rightTendency) changeState(PlayerState.IDLE);
+                else changeState(PlayerState.L_IDLE);
+            }
+
+            if (state == PlayerState.JUMP || state == PlayerState.L_JUMP) {
+                if (animationTick > 0 && animationTick < 4) y -= 20;
+                else if (animationTick > 3 && animationTick < 7) y += 20;
             }
         }
     }
 
-    public void draw(Graphics2D g2) {
-        if (ph.upPressed || ph.downPressed || ph.leftPressed || ph.rightPressed)
-            this.imgState = states.get(states.indexOf(PlayerState.RUN)).getLstImg();
-        else this.imgState = states.get(states.indexOf(PlayerState.IDLE)).getLstImg();
-        g2.drawImage(imgState[spriteNum], this.x, this.y, gp.tileWidth, gp.tileHeight, null);
+    public void render(Graphics2D g2D) {
+        if (health > 0) {
+            animationTick++;
+        } else {
+            if (animationTick < 3) animationTick++;
+        }
+
+        g2D.drawImage(state.getSpriteAtIdx(animationTick), x, y, 128, 64, null);
+    }
+
+    public boolean checkSpecialState(PlayerState s) {
+        return s != PlayerState.IDLE && s != PlayerState.L_IDLE
+                && s != PlayerState.RUN && s != PlayerState.L_RUN
+                && s != PlayerState.HURT && s != PlayerState.L_HURT;
+    }
+
+    public void changeState(PlayerState st) {
+        if (checkSpecialState(state) && (animationTick == state.getImgNum() - 1)) {
+            animationTick = 0;
+            state = st;
+        } else if (!checkSpecialState(state)) {
+            if (state != st) {
+                animationTick = 0;
+                state = st;
+            } else if (animationTick == state.getImgNum() - 1) {
+                animationTick = 0;
+            }
+        }
+    }
+
+    public PlayerHandle getPh() {
+        return ph;
     }
 }

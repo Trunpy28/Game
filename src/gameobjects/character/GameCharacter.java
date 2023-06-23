@@ -1,16 +1,26 @@
 package gameobjects.character;
 
 
+import gameobjects.GameObject;
+
+import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.LinkedList;
 
-public class GameCharacter {
-    public int x, y;
-    public int speed;
-    BufferedImage[] imgState = null;
+public class GameCharacter extends GameObject {
+  protected BufferedImage spriteSheet;
+  protected int animationTick = 0;
+  protected int health;
+  public boolean isAttacked = false;
 
-    public int spriteCounter = 0;
-    public int spriteNum = 0;
+  public GameCharacter(int x, int y, int health) {
+    super(x, y);
+    this.health= health;
+  }
 
-    public LinkedList<PlayerState> states = new LinkedList<>();
+  public void update() {
+  }
+
+  public void render(Graphics g){
+
+  } 
 }

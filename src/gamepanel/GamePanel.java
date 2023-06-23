@@ -1,7 +1,7 @@
 package gamepanel;
 
+
 import gameobjects.character.Player;
-import keyboard.PlayerHandle;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,24 +13,16 @@ public class GamePanel extends JPanel implements Runnable {
     final int row = 10;
     final int screenWidth = tileWidth * col;
     final int screenHeight = tileHeight * row;
-    private int FPS = 120;
+    private int FPS = 10;
 
-    Thread gameThread;
-
-    PlayerHandle pKey = new PlayerHandle();
-    Player player = new Player(this, pKey);
+    Player player = new Player(100, 400, 10);
 
     public GamePanel() {
         this.setPreferredSize(new Dimension(screenWidth, screenHeight));
         this.setBackground(Color.black);
         this.setDoubleBuffered(true);
-        this.addKeyListener(pKey);
+        this.addKeyListener(player.getPh());
         this.setFocusable(true);
-    }
-
-    public void startGameThread() {
-        gameThread = new Thread(this);
-        gameThread.start();
     }
 
     @Override
@@ -42,7 +34,7 @@ public class GamePanel extends JPanel implements Runnable {
         long timer = 0;
         int drawCount = 0;
 
-        while (gameThread != null) {
+        while (true) {
             currentTime = System.nanoTime();
             delta += (currentTime - lastTime) / drawInterval;
             timer += (currentTime - lastTime);
@@ -70,7 +62,7 @@ public class GamePanel extends JPanel implements Runnable {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
-        player.draw(g2);
-        g2.dispose();
+        player.render(g2);
+        //g2.dispose();
     }
 }
