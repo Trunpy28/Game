@@ -7,7 +7,7 @@ import java.awt.*;
 public class Player extends GameCharacter {
 
     private final PlayerHandle ph = new PlayerHandle();
-    private int velocity = 10;
+    private int velocity = 2;
     private PlayerState state = PlayerState.IDLE;
     private boolean rightTendency = true;
 
@@ -16,12 +16,7 @@ public class Player extends GameCharacter {
     }
 
     public void update() {
-        if (ph.low) {
-            if (health != 0) {
-                health--;
-                isAttacked = true;
-            }
-        }
+
         if (health == 0) {
             if (state != PlayerState.DEATH && state != PlayerState.L_DEATH) {
                 if (rightTendency) changeState(PlayerState.DEATH);
@@ -33,39 +28,40 @@ public class Player extends GameCharacter {
                 else changeState(PlayerState.L_HURT);
                 isAttacked = false;
             }
-            if (ph.rightPressed && !ph.upPressed && !ph.downPressed) {
+
+            if (ph.attack) {
+                if (rightTendency && ph.upPressed) changeState(PlayerState.ATTACK_FROM_AIR);
+                else if (!rightTendency && ph.upPressed) changeState(PlayerState.L_ATTACK_FROM_AIR);
+                else if (rightTendency) changeState(PlayerState.ATTACKS);
+                else changeState(PlayerState.L_ATTACKS);
+            } else if (ph.rightPressed && !ph.upPressed && !ph.downPressed) {
                 rightTendency = true;
                 changeState(PlayerState.RUN);
                 x += velocity;
             } else if (ph.leftPressed && !ph.upPressed && !ph.downPressed) {
                 rightTendency = false;
                 changeState(PlayerState.L_RUN);
-                x -= velocity;
+                x-=velocity;
             } else if (ph.upPressed && !ph.downPressed) {
                 if (rightTendency) {
                     changeState(PlayerState.JUMP);
-                    if (ph.rightPressed) x += (velocity / 3);
                 } else {
                     changeState(PlayerState.L_JUMP);
-                    if (ph.leftPressed) x -= (velocity / 3);
                 }
             } else if (ph.downPressed && !ph.upPressed) {
                 if (rightTendency) {
                     changeState(PlayerState.SLIDE);
-                    if (ph.rightPressed) x += (velocity / 3);
                 } else {
                     changeState(PlayerState.L_SLIDE);
-                    if (ph.leftPressed) x -= (velocity / 3);
                 }
-            } else if (((state == PlayerState.HURT || state == PlayerState.L_HURT) && animationTick/2 == 2)
-                    || (state != PlayerState.HURT && state != PlayerState.L_HURT)) {
+            } else {
                 if (rightTendency) changeState(PlayerState.IDLE);
                 else changeState(PlayerState.L_IDLE);
             }
 
             if (state == PlayerState.JUMP || state == PlayerState.L_JUMP) {
-                if (animationTick/2 > 0 && animationTick/2 < 4) y -= 12;
-                else if (animationTick/2 > 3 && animationTick/2 < 7) y += 12;
+                if (animationTick >= 8 && animationTick < 32) y -= 3;
+                else if (animationTick >= 40 && animationTick < 64) y += 3;
             }
         }
     }
@@ -74,27 +70,23 @@ public class Player extends GameCharacter {
         if (health > 0) {
             animationTick++;
         } else {
-            if (animationTick/2 < 3) animationTick++;
+            if (animationTick < 31) animationTick++;
         }
 
-        g2D.drawImage(state.getSpriteAtIdx(animationTick/2), x, y, 128, 64, null);
-    }
-
-    public boolean checkSpecialState(PlayerState s) {
-        return s != PlayerState.IDLE && s != PlayerState.L_IDLE
-                && s != PlayerState.RUN && s != PlayerState.L_RUN
-                && s != PlayerState.HURT && s != PlayerState.L_HURT;
+        g2D.drawImage(state.getSpriteAtIdx(animationTick / 8), x, y, 256, 128, null);
     }
 
     public void changeState(PlayerState st) {
-        if (checkSpecialState(state) && (animationTick/2 == state.getImgNum() - 1)) {
+        if ((PlayerState.stateLevel(st) <= PlayerState.stateLevel(this.state))
+                && (PlayerState.stateLevel(this.state) > 1) && (animationTick == state.getImgNum() * 8 - 1)) {
             animationTick = 0;
             state = st;
-        } else if (!checkSpecialState(state)) {
+        } else if (PlayerState.stateLevel(this.state) == 1
+                || (PlayerState.stateLevel(st) > PlayerState.stateLevel(this.state))) {
             if (state != st) {
                 animationTick = 0;
                 state = st;
-            } else if (animationTick/2 == state.getImgNum() - 1) {
+            } else if (animationTick == state.getImgNum() * 8 - 1) {
                 animationTick = 0;
             }
         }
