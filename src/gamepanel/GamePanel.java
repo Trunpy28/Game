@@ -1,6 +1,7 @@
 package gamepanel;
 
 
+import gameobjects.character.Mushroom;
 import gameobjects.character.Player;
 
 import javax.swing.*;
@@ -15,7 +16,8 @@ public class GamePanel extends JPanel implements Runnable {
     final int screenHeight = tileHeight * row;
     private int FPS = 120;
 
-    Player player = new Player(100, 400, 100);
+    Player player = new Player(100, 250, 100);
+    Mushroom mr = new Mushroom(200,200,10,300,0,player);
 
     public GamePanel() {
         this.setPreferredSize(new Dimension(screenWidth, screenHeight));
@@ -57,12 +59,14 @@ public class GamePanel extends JPanel implements Runnable {
 
     public void update() {
         player.update();
+        mr.update();
     }
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
         player.render(g2);
+        mr.render(g2);
         //g2.dispose();
     }
 }
