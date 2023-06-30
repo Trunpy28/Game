@@ -13,7 +13,6 @@ public class GameCharacter extends GameObject {
   protected int damage;
   protected Rectangle hitbox;
   protected Rectangle attackbox;
-  protected boolean isLeft = false;
   public boolean isAttacked = false;
 
   public GameCharacter(int x, int y, int health) {

@@ -21,6 +21,7 @@ public abstract class Enemy extends GameCharacter {
     protected int xDelta;
     protected int yDelta;
     protected int AttackDistance;
+    protected boolean isLeft = false;
     protected Player player;
 
     public Enemy(int x, int y, int health, int limitX, int limitY, int xMax, int xMin, int enemyType) {

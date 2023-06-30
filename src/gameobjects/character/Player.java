@@ -3,14 +3,17 @@ package gameobjects.character;
 import utils.PlayerHandle;
 
 import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
+import java.awt.image.BufferedImage;
 
 public class Player extends GameCharacter {
 
     private final PlayerHandle ph = new PlayerHandle();
-    private int velocity = 4;
+    private int velocity = 2;
 
     private PlayerState state = PlayerState.IDLE;
-    private boolean rightTendency = true;
+    private boolean facingRight = true;
 
     public Player(int x, int y, int health) {
 
@@ -20,7 +23,7 @@ public class Player extends GameCharacter {
     }
 
     protected void initAttackbox() {
-        if (!isLeft)
+        if (!facingRight)
             attackbox = new Rectangle(x + 55, y + 16,   50, 50);
         else
             attackbox = new Rectangle(x + 30, y + 16, 50, 50);
@@ -30,64 +33,47 @@ public class Player extends GameCharacter {
         hitbox = new Rectangle(x + 55,y + 16, 25, 50 );
     }
     public void updateHitbox() {
-        if(state==PlayerState.SLIDE || state ==PlayerState.L_SLIDE)
+        if(state==PlayerState.SLIDE)
             hitbox.setBounds(x+55,y+40,45,25);
         else hitbox.setBounds(x + 55,y + 16, 25, 50);
-    }
-    public Rectangle getHitbox() {
-        return hitbox;
     }
 
     public void update() {
 
         if (health == 0) {
-            if (state != PlayerState.DEATH && state != PlayerState.L_DEATH) {
-                if (rightTendency) changeState(PlayerState.DEATH);
-                else changeState(PlayerState.L_DEATH);
+            if (state != PlayerState.DEATH) {
+                changeState(PlayerState.DEATH);
             }
         } else {
             if (isAttacked) {
-                if (rightTendency) changeState(PlayerState.HURT);
-                else changeState(PlayerState.L_HURT);
+                changeState(PlayerState.HURT);
                 isAttacked = false;
             }
 
             if (ph.attack) {
-                if (rightTendency && ph.upPressed) changeState(PlayerState.ATTACK_FROM_AIR);
-                else if (!rightTendency && ph.upPressed) changeState(PlayerState.L_ATTACK_FROM_AIR);
-                else if (rightTendency) changeState(PlayerState.ATTACKS);
-                else changeState(PlayerState.L_ATTACKS);
+                changeState(PlayerState.ATTACKS);
             } else if (ph.rightPressed && !ph.upPressed && !ph.downPressed) {
-                rightTendency = true;
+                facingRight = true;
                 changeState(PlayerState.RUN);
                 x += velocity;
             } else if (ph.leftPressed && !ph.upPressed && !ph.downPressed) {
-                rightTendency = false;
-                changeState(PlayerState.L_RUN);
+                facingRight = false;
+                changeState(PlayerState.RUN);
                 x-=velocity;
             } else if (ph.upPressed && !ph.downPressed) {
-                if (rightTendency) {
                     changeState(PlayerState.JUMP);
-                } else {
-                    changeState(PlayerState.L_JUMP);
-                }
             } else if (ph.downPressed && !ph.upPressed) {
-                if (rightTendency) {
                     changeState(PlayerState.SLIDE);
-                } else {
-                    changeState(PlayerState.L_SLIDE);
-                }
             } else {
-                if (rightTendency) changeState(PlayerState.IDLE);
-                else changeState(PlayerState.L_IDLE);
+                changeState(PlayerState.IDLE);
             }
 
-            if (state == PlayerState.JUMP || state == PlayerState.L_JUMP) {
+            if (state == PlayerState.JUMP) {
                 if (animationTick >= 8 && animationTick < 32) y -= 3;
                 else if (animationTick >= 40 && animationTick < 64) y += 3;
             }
 
-            if (state != state.ATTACKS && state != state.L_ATTACKS)
+            if (state != PlayerState.ATTACKS)
                 attackbox.setBounds(0, 0, 0, 0);
             else initAttackbox();
             updateHitbox();
@@ -95,16 +81,19 @@ public class Player extends GameCharacter {
     }
 
     public void render(Graphics2D g2D) {
-        if (health > 0) {
-            animationTick++;
-        } else {
-            if (animationTick < 31) animationTick++;
-        }
-
         g2D.setColor(Color.RED);
         g2D.drawRect(hitbox.x, hitbox.y, (int) hitbox.getWidth(), (int) hitbox.getHeight());
         g2D.drawRect(attackbox.x, attackbox.y, (int) attackbox.getWidth(), (int) attackbox.getHeight());
-        g2D.drawImage(state.getSpriteAtIdx(animationTick / 8), x, y, null);
+        BufferedImage sprite = state.getSpriteAtIdx(animationTick / 8);
+        if (!facingRight) {
+            AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
+            tx.translate(-sprite.getWidth(null), 0);
+            AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+            sprite = op.filter(sprite, null);
+        }
+        g2D.drawImage(sprite, x, y, 128, 64, null);
+        animationTick++;
+        animationTick %= state.getImgNum() * 8;
     }
 
     public void changeState(PlayerState st) {
