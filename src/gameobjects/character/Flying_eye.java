@@ -9,13 +9,13 @@ import java.awt.image.AffineTransformOp;
 
 import static utils.Data.EnemyData.*;
 
-public class Mushroom extends Enemy {
+public class Flying_eye extends Enemy {
 
-    private MushroomState state = MushroomState.RUN;
+    private Flying_eyeState state = Flying_eyeState.RUN;
     private Player player;
 
-    public Mushroom(int x, int y, int limitX, int limitY, int xMax, int xMin, Player player) {
-        super(x, y, 100, limitX, limitY, xMax, xMin, MUSHROOM);
+    public Flying_eye(int x, int y, int limitX, int limitY, int xMax, int xMin, Player player) {
+        super(x, y, 100,limitX, limitY, xMax, xMin, FLYING_EYE);
         this.player = player;
     }
 
@@ -31,24 +31,24 @@ public class Mushroom extends Enemy {
                 if (isLeft) {
                     if (hitbox.intersects(player.getHitbox())) {
                         initAttackbox();
-                        state = MushroomState.ATTACK;
+                        state = Flying_eyeState.ATTACK;
 
                     } else {
-                        state = MushroomState.RUN;
+                        state = Flying_eyeState.RUN;
                         x -= velocity;
                     }
                 } else {
                     if (hitbox.intersects(player.getHitbox())) {
                         initAttackbox();
-                        state = MushroomState.ATTACK;
+                        state = Flying_eyeState.ATTACK;
                     } else {
-                        state = MushroomState.RUN;
+                        state = Flying_eyeState.RUN;
                         x += velocity;
                     }
                 }
             } else {
                 // # basicMode
-                state = MushroomState.RUN;
+                state = Flying_eyeState.RUN;
                 if (isLeft)
                     x -= velocity;
                 else
@@ -60,13 +60,14 @@ public class Mushroom extends Enemy {
                     isLeft = false;
             }
             if (hitbox.intersects(player.getAttackbox())) {
-                state = MushroomState.HURT;
+                state = Flying_eyeState.HURT;
                 currHealth -= player.getDamage();
             }
         } else
-            state = MushroomState.DEATH;
+            state = Flying_eyeState.DEATH;
         updateHitbox(xDelta, yDelta);
-        if (state != MushroomState.ATTACK) attackbox.setBounds(0, 0, 0, 0);
+        if (state != state.ATTACK)
+            attackbox.setBounds(0, 0, 0, 0);
     }
 
     @Override
@@ -82,7 +83,7 @@ public class Mushroom extends Enemy {
             AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
             sprite = op.filter(sprite, null);
         }
-        g2D.drawImage(sprite, x, y, 150, 150, null);
+        g2D.drawImage(sprite, x, y, 150,150,null);
         animationTick++;
         animationTick %= state.getImgNum() * 8;
     }

@@ -10,6 +10,10 @@ public class GameCharacter extends GameObject {
   protected BufferedImage spriteSheet;
   protected int animationTick = 0;
   protected int health;
+  protected int damage;
+  protected Rectangle hitbox;
+  protected Rectangle attackbox;
+  protected boolean isLeft = false;
   public boolean isAttacked = false;
 
   public GameCharacter(int x, int y, int health) {
@@ -22,5 +26,21 @@ public class GameCharacter extends GameObject {
 
   public void render(Graphics g){
 
-  } 
+  }
+
+  public int getHealth() {
+    return health;
+  }
+
+  public int getDamage() {
+    return damage;
+  }
+
+  public Rectangle getHitbox() {
+    return hitbox;
+  }
+
+  public Rectangle getAttackbox() {
+    return attackbox;
+  }
 }

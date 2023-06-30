@@ -95,7 +95,7 @@ public class Data {
         public static int getVelocity(int enemyType) {
             switch (enemyType) {
                 case FLYING_EYE:
-                    return 6;
+                    return 2;
                 case GOBLIN:
                     return 3;
                 case MUSHROOM:

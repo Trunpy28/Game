@@ -8,11 +8,34 @@ public class Player extends GameCharacter {
 
     private final PlayerHandle ph = new PlayerHandle();
     private int velocity = 4;
+
     private PlayerState state = PlayerState.IDLE;
     private boolean rightTendency = true;
 
     public Player(int x, int y, int health) {
+
         super(x, y, health);
+        initHitbox();
+        initAttackbox();
+    }
+
+    protected void initAttackbox() {
+        if (!isLeft)
+            attackbox = new Rectangle(x + 55, y + 16,   50, 50);
+        else
+            attackbox = new Rectangle(x + 30, y + 16, 50, 50);
+    }
+
+    public void initHitbox() {
+        hitbox = new Rectangle(x + 55,y + 16, 25, 50 );
+    }
+    public void updateHitbox() {
+        if(state==PlayerState.SLIDE || state ==PlayerState.L_SLIDE)
+            hitbox.setBounds(x+55,y+40,45,25);
+        else hitbox.setBounds(x + 55,y + 16, 25, 50);
+    }
+    public Rectangle getHitbox() {
+        return hitbox;
     }
 
     public void update() {
@@ -63,6 +86,11 @@ public class Player extends GameCharacter {
                 if (animationTick >= 8 && animationTick < 32) y -= 3;
                 else if (animationTick >= 40 && animationTick < 64) y += 3;
             }
+
+            if (state != state.ATTACKS && state != state.L_ATTACKS)
+                attackbox.setBounds(0, 0, 0, 0);
+            else initAttackbox();
+            updateHitbox();
         }
     }
 
@@ -73,7 +101,10 @@ public class Player extends GameCharacter {
             if (animationTick < 31) animationTick++;
         }
 
-        g2D.drawImage(state.getSpriteAtIdx(animationTick / 8), x, y, 256, 128, null);
+        g2D.setColor(Color.RED);
+        g2D.drawRect(hitbox.x, hitbox.y, (int) hitbox.getWidth(), (int) hitbox.getHeight());
+        g2D.drawRect(attackbox.x, attackbox.y, (int) attackbox.getWidth(), (int) attackbox.getHeight());
+        g2D.drawImage(state.getSpriteAtIdx(animationTick / 8), x, y, null);
     }
 
     public void changeState(PlayerState st) {

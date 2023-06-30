@@ -1,6 +1,7 @@
 package gamepanel;
 
 
+import gameobjects.character.Flying_eye;
 import gameobjects.character.Mushroom;
 import gameobjects.character.Player;
 
@@ -16,8 +17,10 @@ public class GamePanel extends JPanel implements Runnable {
     final int screenHeight = tileHeight * row;
     private int FPS = 120;
 
-    Player player = new Player(100, 250, 100);
-    Mushroom mr = new Mushroom(200,200,10,200,0,player);
+    Player player = new Player(100, 150, 100);
+    Mushroom mr = new Mushroom(200,200,10, 40, 200,0,player);
+
+    Flying_eye fly = new Flying_eye(200,100,40,60,200,0,player);
 
     public GamePanel() {
         this.setPreferredSize(new Dimension(screenWidth, screenHeight));
@@ -60,6 +63,7 @@ public class GamePanel extends JPanel implements Runnable {
     public void update() {
         player.update();
         mr.update();
+        fly.update();
     }
 
     public void paintComponent(Graphics g) {
@@ -67,6 +71,7 @@ public class GamePanel extends JPanel implements Runnable {
         Graphics2D g2 = (Graphics2D) g;
         player.render(g2);
         mr.render(g2);
+        fly.render(g2);
         //g2.dispose();
     }
 }
