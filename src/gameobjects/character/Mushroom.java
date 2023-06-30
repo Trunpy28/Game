@@ -6,6 +6,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
+
 import static utils.Data.EnemyData.*;
 
 public class Mushroom extends Enemy {
@@ -13,22 +14,22 @@ public class Mushroom extends Enemy {
     private MushroomState state = MushroomState.RUN;
     private Player player;
 
-    public Mushroom(int x, int y, int limitX, int xMax, int xMin,Player player) {
-        super(x, y, 100,limitX, xMax, xMin, MUSHROOM);
-        this.player=player;
+    public Mushroom(int x, int y, int limitX, int xMax, int xMin, Player player) {
+        super(x, y, 100, limitX, xMax, xMin, MUSHROOM);
+        this.player = player;
     }
 
     @Override
     public void update() {
         if (currHealth > 0) {
-            if (Math.abs(player.getX() + 66- x) <= limitX) {
+            if (Math.abs(player.getX() + 66 - x) <= limitX) {
                 // # attackMode
-                if (player.getX() +66<= x)
+                if (player.getX() + 66 <= x)
                     isLeft = true;
                 else
                     isLeft = false;
                 if (isLeft) {
-                    if (x - player.getX() -66 <= 30) {
+                    if (x - player.getX() - 66 <= 30) {
                         initAttackbox();
                         state = MushroomState.ATTACK;
 
@@ -37,7 +38,7 @@ public class Mushroom extends Enemy {
                         x -= velocity;
                     }
                 } else {
-                    if (player.getX() + 66- x <= getWidth(enemyType) + getAttackDistance(enemyType)) {
+                    if (player.getX() + 66 - x <= getWidth(enemyType) + getAttackDistance(enemyType)) {
                         initAttackbox();
                         state = MushroomState.ATTACK;
                     } else {
@@ -45,7 +46,7 @@ public class Mushroom extends Enemy {
                         x += velocity;
                     }
                 }
-            } else if (Math.abs(player.getX() +66 - x) > limitX) {
+            } else if (Math.abs(player.getX() + 66 - x) > limitX) {
                 // # basicMode
                 state = MushroomState.RUN;
                 if (isLeft)
@@ -65,7 +66,7 @@ public class Mushroom extends Enemy {
         } else
             state = MushroomState.DEATH;
         updateHitbox(xDelta, yDelta);
-        if(state!=MushroomState.ATTACK) attackbox.setBounds(0,0,0,0);
+        if (state != MushroomState.ATTACK) attackbox.setBounds(0, 0, 0, 0);
     }
 
     @Override
@@ -73,15 +74,15 @@ public class Mushroom extends Enemy {
         g2D.setColor(Color.RED);
         g2D.drawRect(attackbox.x, attackbox.y, (int) attackbox.getWidth(), (int) attackbox.getHeight());
         g2D.setColor(Color.WHITE);
-        BufferedImage sprite = state.getSpriteAtIdx(animationTick/16);
+        BufferedImage sprite = state.getSpriteAtIdx(animationTick / 8);
         if (isLeft) {
             AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
             tx.translate(-sprite.getWidth(null), 0);
             AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
             sprite = op.filter(sprite, null);
         }
-        g2D.drawImage(sprite, x, y, 150,150,null);
+        g2D.drawImage(sprite, x, y, 150, 150, null);
         animationTick++;
-        animationTick %= state.getImgNum()*16;
+        animationTick %= state.getImgNum() * 8;
     }
 }

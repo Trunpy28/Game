@@ -27,7 +27,7 @@ public class Data {
                 case GOBLIN:
                     return 35;
                 case MUSHROOM:
-                    return 700;
+                    return 38;
                 case UNDEAD:
                     return 63;
                 case SUMMON_OBJECT:
@@ -99,7 +99,7 @@ public class Data {
                 case GOBLIN:
                     return 3;
                 case MUSHROOM:
-                    return 1;
+                    return 2;
                 case UNDEAD:
                     return 0;
                 case SUMMON_OBJECT:

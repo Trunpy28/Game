@@ -7,7 +7,7 @@ import java.awt.*;
 public class Player extends GameCharacter {
 
     private final PlayerHandle ph = new PlayerHandle();
-    private int velocity = 7;
+    private int velocity = 4;
     private PlayerState state = PlayerState.IDLE;
     private boolean rightTendency = true;
 

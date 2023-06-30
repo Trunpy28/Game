@@ -17,7 +17,7 @@ public class GamePanel extends JPanel implements Runnable {
     private int FPS = 120;
 
     Player player = new Player(100, 250, 100);
-    Mushroom mr = new Mushroom(200,200,10,300,0,player);
+    Mushroom mr = new Mushroom(200,200,10,200,0,player);
 
     public GamePanel() {
         this.setPreferredSize(new Dimension(screenWidth, screenHeight));
